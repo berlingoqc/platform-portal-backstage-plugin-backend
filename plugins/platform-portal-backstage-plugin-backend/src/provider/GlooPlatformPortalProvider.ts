@@ -17,7 +17,7 @@ import {
   ApiVersion,
   ApiVersionExtended,
 } from './api-types';
-import { doAccessTokenRequest, parseJwt } from './utility';
+//import { doAccessTokenRequest, parseJwt } from './utility';
 
 type PortalServerType = 'gloo-mesh-gateway' | 'gloo-gateway' | 'unknown';
 
@@ -70,6 +70,8 @@ export class GlooPlatformPortalProvider implements EntityProvider {
   getProviderName = () => `gloo-platform-portal-backend-provider`;
   async connect(connection: EntityProviderConnection): Promise<void> {
     this.connection = connection;
+
+    this.run().then(() => { console.log("run is run"); });
   }
 
   updatePortalServerUrl() {
@@ -130,16 +132,16 @@ export class GlooPlatformPortalProvider implements EntityProvider {
       );
       return;
     }
-    const res = await doAccessTokenRequest(
+    const res = { access_token: "" } as any;
+    this.latestTokensResponse = res;
+    /*
+    await doAccessTokenRequest(
       'client_credentials',
       this.configUtil.getTokenEndpoint(),
       this.configUtil.getClientId(),
       this.configUtil.getClientSecret(),
     );
-    this.latestTokensResponse = res;
     if (!this.latestTokensResponse) {
-      // If there's a problem, wait to restart the access token
-      // requests so as to not overload the auth server.
       this.warn('No latest access token. Re-requesting the access_token.');
       setTimeout(this.startTokensRequests.bind(this), 5000);
       return;
@@ -148,7 +150,6 @@ export class GlooPlatformPortalProvider implements EntityProvider {
       this.log('Got the access_token.');
     }
     //
-    // Parse the access_token JWT to find when it expires.
     const parsedToken = parseJwt(this.latestTokensResponse.access_token);
     if (!parsedToken.exp) {
       this.warn('No `exp` property found in the access_token JWT.');
@@ -164,13 +165,10 @@ export class GlooPlatformPortalProvider implements EntityProvider {
     if (this.debugLogging) {
       this.log('Setting a timeout to get the next access token.');
     }
-    // Set the timeout to request new tokens.
     setTimeout(
       this.startTokensRequests.bind(this),
-      // Don't make this request more than once a second,
-      // and do the refresh 5 seconds early.
       Math.max(1000, millisUntilExpires - 5000),
-    );
+    );*/
   }
 
   /**
